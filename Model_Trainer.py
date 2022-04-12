@@ -28,12 +28,19 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 target_names = ["ar", "cc_2_front", "cc_back", "cc_chip_back", "cc_chip_front", "cm_back", "cm_front", "dl_front"]
+debug = True
 
 def accuracy(y_pred,y_true):
     y_pred = F.softmax(y_pred,dim = 1)
     top_p,top_class = y_pred.topk(1,dim = 1)
     equals = top_class == y_true.view(*top_class.shape)
     return torch.mean(equals.type(torch.FloatTensor))
+
+def debug(list_labels, y_list_pred, list_images):
+    os.makedirs('Debug_image', exist_ok = True)
+    for i in range(list_labels.shape[0]):
+        if list_labels[i]!=y_list_pred[i]:
+            save_image(list_images[i], "Debug_image/" + target_names[list_labels[i]] + "_" + target_names[y_list_pred[i]] + ".jpg")
 
 class Card_Trainer():
     
@@ -78,6 +85,7 @@ class Card_Trainer():
 
     
     def valid_batch_loop(self,model,validloader, global_step):
+        debug = True
         
         valid_loss = 0.0
         valid_acc = 0.0
@@ -102,14 +110,35 @@ class Card_Trainer():
             if count == 1:
                 y_list_pred = y_pred.detach().cpu().numpy()
                 list_labels = labels.detach().cpu().numpy()
+                list_images = images.detach().cpu().numpy()
             else:
                 y_list_pred = np.concatenate([y_list_pred, y_pred.detach().cpu().numpy()])
                 list_labels = np.concatenate([list_labels, labels.detach().cpu().numpy()])
+                list_images = np.concatenate([list_images,images.detach().cpu().numpy()], axis = 0)
             #print(labels.detach().cpu().numpy())
             #print(y_pred.detach().cpu().numpy())
             #print(classification_report(labels.detach().cpu().numpy(), y_pred.detach().cpu().numpy(), target_names=target_names))
-
-        writer.add_scalar('val_loss', valid_loss, global_step)
+            #print("Label:")
+            #print(list_labels)
+            #print("List Pred:")
+            #print(y_list_pred)
+            if debug == True:
+                print("True debug")
+                os.makedirs('debug', exist_ok = True)
+                list_labels_2 = labels.detach().cpu().numpy()
+                y_pred = F.softmax(logits,dim = 1)
+                top_p,y_pred = y_pred.topk(1,dim = 1)
+                y_pred = y_pred.view(*labels.shape)
+                y_list_pred_2 = y_pred.detach().cpu().numpy()
+                inv_normalize = T.Normalize(mean=[-0.485/0.229, -0.456/0.224, -0.406/0.225],std=[1/0.229, 1/0.224, 1/0.255])
+                #inv_tensor = inv_normalize(tensor)
+                #unorm = UnNormalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+                images = inv_normalize(images)
+                for i in range(list_labels_2.shape[0]):
+                    if list_labels_2[i]!=y_list_pred_2[i]:
+                        save_image(images[i],"debug/" + target_names[list_labels_2[i]] + "_" + target_names[y_list_pred_2[i]] + str(count) + "_" + str(i) + ".jpg")
+        
+        writer.add_scalar('val_loss', valid_loss / len(validloader), global_step)
         print(classification_report(list_labels, y_list_pred, target_names=target_names))
         return valid_loss / len(validloader), valid_acc / len(validloader)
             

@@ -10,10 +10,10 @@ import torch
 import numpy as np 
 from torchvision import transforms as T,datasets
 from torchvision.utils import save_image
-#from clearml import Task
+from clearml import Task
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter("runs")
-#task = Task.init(project_name='Card Classify', task_name='test model fix1')
+task = Task.init(project_name='Card Classify', task_name='test model fix1')
 from PIL import ImageFile
 from PIL import Image, ImageEnhance, ImageOps
 from config import CFG
@@ -24,6 +24,7 @@ from Model_Trainer import Card_Trainer
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 os.makedirs('model', exist_ok = True)
+continue_train = False
 
 
 data_loader = Data_Loader()
@@ -56,6 +57,11 @@ model.classifier = nn.Sequential(
 
 from torchsummary import  summary
 model.to(device) # move the model to GPU
+
+if continue_train == True:
+  print("Load the epoch model")
+  model.load_state_dict(torch.load('model_epoch.pt'))
+
 summary(model,input_size=(3,224,224))
 target_names = ["ar", "cc_2_front", "cc_back", "cc_chip_back", "cc_chip_front", "cm_back", "cm_front", "dl_front"]
 

@@ -95,21 +95,26 @@ model.eval()
 
 global_step = len(trainloader)
 
-avg_test_loss, avg_test_acc = trainer.valid_batch_loop(model,testloader, global_step)
+#avg_test_loss, avg_test_acc = trainer.valid_batch_loop(model,testloader, global_step)
 
 
-print("Test Loss : {}".format(avg_test_loss))
-print("Test Acc : {}".format(avg_test_acc))
+#print("Test Loss : {}".format(avg_test_loss))
+#print("Test Acc : {}".format(avg_test_acc))
 
-'''
 import torch.nn.functional as F
+
+test_transform = T.Compose([                          
+                             T.Resize(size=(CFG.img_size,CFG.img_size)), # Resizing the image to be 224 by 224
+                             #T.RandomRotation(degrees=(-20,+20)), #NO need for validation
+                             T.ToTensor(), #converting the dimension from (height,weight,channel) to (channel,height,weight) convention of PyTorch
+                             T.Normalize([0.485,0.456,0.406],[0.229,0.224,0.225]) # Normalize by 3 means 3 StD's of the image net, 3 channels
+                             ])
 
 testset_Internet =datasets.ImageFolder('Data',transform=test_transform)
 class_name =["ar", "cc_2_front", "cc_back", "cc_chip_back", "cc_chip_front", "cm_back", "cm_front", "dl_front"]
 testloader_internet = DataLoader(testset_Internet,batch_size=16,shuffle=True)
 
-trainer.check(model,testloader_internet, 100)
-#avg_test_loss, avg_test_acc = trainer.valid_batch_loop(model,testloader_internet, 100)
-#print("Test Loss : {}".format(avg_test_loss))
-#print("Test Acc : {}".format(avg_test_acc))
-'''
+#trainer.check(model,testloader_internet, 100)
+avg_test_loss, avg_test_acc = trainer.valid_batch_loop(model,testloader_internet, 100)
+print("Test Loss : {}".format(avg_test_loss))
+print("Test Acc : {}".format(avg_test_acc))
