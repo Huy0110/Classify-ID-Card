@@ -85,7 +85,7 @@ class Card_Trainer():
 
     
     def valid_batch_loop(self,model,validloader, global_step):
-        debug = True
+        #debug = True
         
         valid_loss = 0.0
         valid_acc = 0.0
