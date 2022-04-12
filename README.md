@@ -12,10 +12,10 @@ Please install:
 
 # Dataset
 
-##The formated dataset: 
+## The formated dataset: 
 The formated dataset is simiar to this link : https://drive.google.com/drive/folders/1_wcXUxM5_iPQ8j9uz-PyjkWxT4YgCKM7?usp=sharing
 
-##The original dataset:
+## The original dataset:
 The original dataset is similar to 3 forder in git : Train, Val, Test
 
 Note that the name of each image in the original dataset must folow the rules: [label]_[something else] 
