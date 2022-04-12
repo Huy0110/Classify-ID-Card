@@ -27,7 +27,7 @@ python effi_data_process.py
 
 If you want to controll the number of data in each forder, you can run this command (If you have the original dataset):
 ```bash
-python effi_data_process_controll.py
+python effi_data_process_controll.py --number_of_train 1000 --number_of_val 120 --number_of_train 120
 ```
 # Run
 ## Train
