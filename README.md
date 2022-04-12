@@ -20,9 +20,14 @@ The original dataset is similar to 3 forder in git : Train, Val, Test
 
 Note that the name of each image in the original dataset must folow the rules: [label]_[something else] 
 
-Run this command to process the data to the formated dataset (If you don't have the formated dataset) :
+Run this command to process the data to the formated dataset (If you have the original dataset) :
 ```bash
 python effi_data_process.py
+```
+
+If you want to controll the number of data in each forder, you can run this command (If you have the original dataset):
+```bash
+python effi_data_process_controll.py
 ```
 # Run
 ## Train
